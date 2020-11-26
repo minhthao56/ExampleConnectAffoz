@@ -1,8 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, PermissionsAndroid, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  PermissionsAndroid,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
 import {Icon} from 'react-native-elements';
 import SimpleToast from 'react-native-simple-toast';
 import {WifiWizard} from 'react-native-wifi-and-hotspot-wizard';
+import NetInfo from '@react-native-community/netinfo';
 
 import {Button, OneWifi} from '../../components';
 
@@ -10,6 +17,7 @@ export default function Connect({navigation}) {
   const [listWifi, setListWifi] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [SSIDCurrent, setSSIDCurrent] = useState('');
+
   const permissionsAndroid = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -30,17 +38,20 @@ export default function Connect({navigation}) {
       console.warn(err);
     }
   };
-  // const getSSIDCurrent = () => {
-  //   wifi.getSSID(ssid => {
-  //     setSSIDCurrent(ssid);
-  //   });
-  // };
+
+  const currentSSID = () => {
+    NetInfo.fetch('wifi').then(state => {
+      setSSIDCurrent(state.details.ssid);
+    });
+  };
+
   const scanWifi = () => {
     setIsLoading(true);
     WifiWizard.getNearbyNetworks()
       .then(networks => {
         setListWifi(networks);
         setIsLoading(false);
+        currentSSID();
       })
       .catch(err => {
         SimpleToast.show(err);
@@ -51,6 +62,7 @@ export default function Connect({navigation}) {
   useEffect(() => {
     permissionsAndroid();
     scanWifi();
+    currentSSID();
   }, []);
   const handleDetailWifi = SSID => {
     navigation.navigate('DetailConnect', {
@@ -63,7 +75,7 @@ export default function Connect({navigation}) {
         <Icon name="share-2" type="feather" size={16} reverse />
         <Text style={Styles.text}>Danh sách wifi</Text>
       </View>
-      <View style={Styles.constainer}>
+      <ScrollView style={Styles.constainer}>
         {isLoading ? (
           <Text>Đang tìm wifi...</Text>
         ) : (
@@ -74,11 +86,12 @@ export default function Connect({navigation}) {
                 key={i}
                 handleDetailWifi={handleDetailWifi}
                 isConnect={SSIDCurrent === item.SSID ? true : false}
+                isPrivate={item.BSSID ? true : false}
               />
             );
           })
         )}
-      </View>
+      </ScrollView>
       <View style={Styles.button}>
         <Button onPress={() => scanWifi()}>Scan again</Button>
       </View>

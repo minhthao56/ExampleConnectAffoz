@@ -2,7 +2,12 @@ import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-elements';
 
-export default function OneWifi({item, handleDetailWifi, isConnect}) {
+export default function OneWifi({
+  item,
+  handleDetailWifi,
+  isConnect,
+  isPrivate,
+}) {
   return (
     <TouchableOpacity
       style={Styles.oneWifi}
@@ -16,7 +21,13 @@ export default function OneWifi({item, handleDetailWifi, isConnect}) {
       />
       <View>
         <Text>{item.SSID}</Text>
-        {isConnect && <Text style={Styles.connect}>Connect</Text>}
+        {isConnect ? (
+          <Text style={Styles.connect}>Connect</Text>
+        ) : isPrivate ? (
+          <Text style={Styles.connect}>Private</Text>
+        ) : (
+          <Text style={Styles.connect}>Public</Text>
+        )}
       </View>
     </TouchableOpacity>
   );
