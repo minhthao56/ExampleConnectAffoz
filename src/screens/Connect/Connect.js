@@ -67,6 +67,7 @@ export default function Connect({navigation}) {
   const handleDetailWifi = SSID => {
     navigation.navigate('DetailConnect', {
       SSID: SSID,
+      listWifi: listWifi,
     });
   };
   return (

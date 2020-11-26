@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,25 +10,58 @@ import {
 import SimpleToast from 'react-native-simple-toast';
 import {WifiWizard} from 'react-native-wifi-and-hotspot-wizard';
 import NetInfo from '@react-native-community/netinfo';
+import {Picker} from '@react-native-picker/picker';
+import axios from 'axios';
 
 import {Button, Input} from '../../components';
-import axios from 'axios';
 
 export default function DetailConnect({route}) {
   const [password, setPassword] = useState('');
   const [myPassword, setMyPassword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [checkWifi, setCheckWifi] = useState(false);
 
-  const {SSID} = route.params;
+  const [idAddress, setIdAddress] = useState('');
+  const {SSID, listWifi} = route.params;
+  const [chooseSSID, setChooseSSID] = useState(listWifi[0].SSID);
 
-  const sendInfo = (idAddress, SSID) => {
-    axios
-      .get(`${idAddress}?id =${SSID}&pass=${myPassword}`)
-      .then(res => {
-        console.log(res.data);
+  const sendInfo = () => {
+    console.log(idAddress, myPassword, chooseSSID);
+    // axios
+    //   .get(`http://${idAddress}/?id =${chooseSSID}&pass=${myPassword}`)
+    //   .then(res => {
+    //     console.log(res.data);
+    //   })
+    //   .catch(err => console.log('axios', err));
+
+    const network = listWifi.filter(item => {
+      return item.SSID == chooseSSID;
+    });
+    SimpleToast.show(`Connecting to ${SSID} again...`);
+    WifiWizard.connectToNetwork(network[0], chooseSSID, myPassword)
+      .then(data => {
+        if (data.status == 'connected') {
+          SimpleToast.show(`Connected to ${network[0].SSID}`);
+          setModalVisible(false);
+        } else {
+          SimpleToast.show('Failed To Connect');
+        }
       })
-      .catch(err => console.log('axios', err));
+      .catch(err => {
+        SimpleToast.show(err);
+      });
+  };
+
+  const checkConnect = () => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Is connected?', state.isConnected);
+      if (state.isConnected) {
+        NetInfo.fetch('wifi').then(state => {
+          setIdAddress(state.details.ipAddress);
+          unsubscribe();
+          setModalVisible();
+        });
+      }
+    });
   };
 
   const connectWifi = () => {
@@ -45,8 +78,7 @@ export default function DetailConnect({route}) {
           .then(data => {
             if (data.status == 'connected') {
               SimpleToast.show(`Connected to ${network[0].SSID}`);
-              const nowSSID = network[0].SSID;
-              setCheckWifi(true);
+              checkConnect();
             } else {
               SimpleToast.show('Failed To Connect');
             }
@@ -57,20 +89,7 @@ export default function DetailConnect({route}) {
       }
     });
   };
-  useEffect(() => {
-    // Subscribe
-    const unsubscribe = NetInfo.addEventListener(state => {
-      if (state.isConnected) {
-        setCheckWifi(false);
-      } else {
-        setCheckWifi(true);
-      }
-      console.log(state.isConnected);
-    });
 
-    // Unsubscribe
-    unsubscribe();
-  }, [checkWifi]);
   return (
     <View style={Styles.container}>
       <Text style={Styles.name}>{SSID}</Text>
@@ -86,7 +105,19 @@ export default function DetailConnect({route}) {
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={Styles.centeredView}>
           <View style={Styles.modalView}>
-            <Text style={{marginBottom: 16}}>{SSID}</Text>
+            <Text>Choose your wifi</Text>
+            <Picker
+              selectedValue={chooseSSID}
+              style={{height: 50, width: '80%'}}
+              onValueChange={(itemValue, itemIndex) =>
+                setChooseSSID(itemValue)
+              }>
+              {listWifi.map((item, i) => {
+                return (
+                  <Picker.Item label={item.SSID} value={item.SSID} key={i} />
+                );
+              })}
+            </Picker>
             <TextInput
               placeholder="Password"
               secureTextEntry={true}
@@ -109,7 +140,8 @@ export default function DetailConnect({route}) {
                 alignItems: 'center',
                 borderRadius: 4,
                 marginTop: 16,
-              }}>
+              }}
+              onPress={sendInfo}>
               <Text style={{textAlign: 'center'}}>Gửi</Text>
             </TouchableHighlight>
           </View>
