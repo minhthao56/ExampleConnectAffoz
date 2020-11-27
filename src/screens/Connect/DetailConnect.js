@@ -26,29 +26,29 @@ export default function DetailConnect({route}) {
 
   const sendInfo = () => {
     console.log(idAddress, myPassword, chooseSSID);
-    // axios
-    //   .get(`http://${idAddress}/?id =${chooseSSID}&pass=${myPassword}`)
-    //   .then(res => {
-    //     console.log(res.data);
-    //   })
-    //   .catch(err => console.log('axios', err));
+    axios
+      .get(`http://192.168.4.1/?id =${chooseSSID}&pass=${myPassword}`)
+      .then(res => {
+        console.log(res.data);
 
-    const network = listWifi.filter(item => {
-      return item.SSID == chooseSSID;
-    });
-    SimpleToast.show(`Connecting to ${SSID} again...`);
-    WifiWizard.connectToNetwork(network[0], chooseSSID, myPassword)
-      .then(data => {
-        if (data.status == 'connected') {
-          SimpleToast.show(`Connected to ${network[0].SSID}`);
-          setModalVisible(false);
-        } else {
-          SimpleToast.show('Failed To Connect');
-        }
+        const network = listWifi.filter(item => {
+          return item.SSID == chooseSSID;
+        });
+        SimpleToast.show(`Connecting to ${SSID} again...`);
+        WifiWizard.connectToNetwork(network[0], chooseSSID, myPassword)
+          .then(data => {
+            if (data.status == 'connected') {
+              SimpleToast.show(`Connected to ${network[0].SSID}`);
+              setModalVisible(false);
+            } else {
+              SimpleToast.show('Failed To Connect');
+            }
+          })
+          .catch(err => {
+            SimpleToast.show(err);
+          });
       })
-      .catch(err => {
-        SimpleToast.show(err);
-      });
+      .catch(err => console.log('axios', err));
   };
 
   const checkConnect = () => {
@@ -70,6 +70,7 @@ export default function DetailConnect({route}) {
       let network = networks.filter(network => {
         return network.SSID == SSID;
       });
+      console.log(networks);
       if (network.length < 1) {
         SimpleToast.show('network not found');
       } else {
