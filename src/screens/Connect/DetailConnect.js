@@ -12,6 +12,7 @@ import SimpleToast from 'react-native-simple-toast';
 import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import {Overlay} from 'react-native-elements';
 
 import {Button, Input} from '../../components';
 import {connectWifiNetwork} from '../../helpers/connectWifi';
@@ -148,68 +149,64 @@ export default function DetailConnect({route}) {
       )}
 
       <Button onPress={connectWifi}>Kết nối</Button>
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={Styles.centeredView}>
-          <View style={Styles.modalView}>
-            {isLoading ? (
-              <View>
-                <ActivityIndicator size="large" color="#facd02" />
-                {isTakeSerilNumber ? (
-                  <Text>Taking serialNumer...</Text>
-                ) : (
-                  <Text>Connecting...</Text>
-                )}
-              </View>
+      <Overlay
+        Overlay
+        isVisible={modalVisible}
+        onBackdropPress={() => setModalVisible(false)}
+        overlayStyle={Styles.overlay}>
+        {isLoading ? (
+          <View>
+            <ActivityIndicator size="large" color="#facd02" />
+            {isTakeSerilNumber ? (
+              <Text>Taking serialNumer...</Text>
             ) : (
-              <>
-                <Text>Choose your wifi</Text>
-                <Picker
-                  selectedValue={chooseSSID}
-                  style={{height: 50, width: '80%'}}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setChooseSSID(itemValue)
-                  }>
-                  {listWifi.map((item, i) => {
-                    return (
-                      <Picker.Item
-                        label={item.SSID}
-                        value={item.SSID}
-                        key={i}
-                      />
-                    );
-                  })}
-                </Picker>
-                <TextInput
-                  placeholder="Password"
-                  secureTextEntry={true}
-                  onChangeText={text => setMyPassword(text)}
-                  value={myPassword}
-                  style={{
-                    borderWidth: 1,
-                    borderColor: '#ddd',
-                    borderRadius: 5,
-                    width: '80%',
-                    height: 38,
-                  }}
-                />
-                <TouchableHighlight
-                  style={{
-                    width: 100,
-                    height: 38,
-                    backgroundColor: '#facd02',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderRadius: 4,
-                    marginTop: 16,
-                  }}
-                  onPress={sendInfo}>
-                  <Text style={{textAlign: 'center'}}>Gửi</Text>
-                </TouchableHighlight>
-              </>
+              <Text>Connecting...</Text>
             )}
           </View>
-        </View>
-      </Modal>
+        ) : (
+          <>
+            <Text>Choose your wifi</Text>
+            <Picker
+              selectedValue={chooseSSID}
+              style={{height: 50, width: '80%'}}
+              onValueChange={(itemValue, itemIndex) =>
+                setChooseSSID(itemValue)
+              }>
+              {listWifi.map((item, i) => {
+                return (
+                  <Picker.Item label={item.SSID} value={item.SSID} key={i} />
+                );
+              })}
+            </Picker>
+            <TextInput
+              placeholder="Password"
+              secureTextEntry={true}
+              onChangeText={text => setMyPassword(text)}
+              value={myPassword}
+              style={{
+                borderWidth: 1,
+                borderColor: '#ddd',
+                borderRadius: 5,
+                width: '80%',
+                height: 38,
+              }}
+            />
+            <TouchableHighlight
+              style={{
+                width: 100,
+                height: 38,
+                backgroundColor: '#facd02',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 4,
+                marginTop: 16,
+              }}
+              onPress={sendInfo}>
+              <Text style={{textAlign: 'center'}}>Gửi</Text>
+            </TouchableHighlight>
+          </>
+        )}
+      </Overlay>
       <Toast ref={ref => Toast.setRef(ref)} />
     </View>
   );
@@ -229,43 +226,9 @@ const Styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
   },
-  centeredView: {
-    flex: 1,
+  overlay: {
+    width: '95%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    // padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    width: '100%',
-    height: 200,
-    justifyContent: 'center',
-  },
-  openButton: {
-    backgroundColor: '#F194FF',
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
   },
 });

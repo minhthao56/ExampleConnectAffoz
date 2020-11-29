@@ -9,12 +9,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Icon} from 'react-native-elements';
 import Toast from 'react-native-toast-message';
 
-import {Login, Home, Profile, ConnectStack} from '../screens';
+import {Login, Home, Profile, Connect, DetailConnect} from '../screens';
 import {getCurrentUser} from '../redux/slice/currentUserSlice';
 import {changeLogin} from '../redux/slice/changeView';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
 export default function Router() {
   const [isShowHome, setIsShowHome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +41,27 @@ export default function Router() {
       dispatch(changeLogin());
     }
   };
+
+  function ConnectWifi() {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Connect"
+          component={Connect}
+          name="Connect"
+          component={Connect}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          n
+          name="DetailConnect"
+          component={DetailConnect}
+          options={{title: 'Kết nối'}}
+          component={DetailConnect}
+        />
+      </Stack.Navigator>
+    );
+  }
 
   useEffect(() => {
     const getData = async () => {
@@ -78,7 +100,7 @@ export default function Router() {
 
                   if (route.name === 'Home') {
                     iconName = 'home';
-                  } else if (route.name === 'ConnectStack') {
+                  } else if (route.name === 'ConnectWifi') {
                     iconName = 'wifi';
                   } else if (route.name === 'Profile') {
                     iconName = 'user';
@@ -98,7 +120,7 @@ export default function Router() {
                 inactiveTintColor: 'gray',
               }}>
               <Tab.Screen name="Home" component={Home} />
-              <Tab.Screen name="ConnectStack" component={ConnectStack} />
+              <Tab.Screen name="ConnectWifi" component={ConnectWifi} />
               <Tab.Screen name="Profile" component={Profile} />
             </Tab.Navigator>
           </>

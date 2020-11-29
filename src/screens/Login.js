@@ -4,6 +4,7 @@ import {Alert, StyleSheet, View} from 'react-native';
 import {useDispatch} from 'react-redux';
 import RNRestart from 'react-native-restart';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 import {Input, Button, Logo} from '../components';
 import {login} from '../redux/slice/authSlice';
@@ -24,7 +25,16 @@ export default function Login() {
         await dispatch(changeHome());
       }
     } catch (error) {
-      Alert.alert('Email, số điện thoại hoặc mật khẩu của bạn sai!!!');
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Error login',
+        text2: 'Mật khẩu, email hoặc số điện thoại của bạn không đúng',
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 10,
+        bottomOffset: 40,
+      });
     }
   };
 
