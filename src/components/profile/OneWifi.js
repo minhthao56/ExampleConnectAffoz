@@ -11,7 +11,7 @@ export default function OneWifi({
   return (
     <TouchableOpacity
       style={Styles.oneWifi}
-      onPress={() => handleDetailWifi(item.SSID)}>
+      onPress={() => handleDetailWifi(item.SSID, item.capabilities)}>
       <Icon
         name="wifi"
         type="feather"

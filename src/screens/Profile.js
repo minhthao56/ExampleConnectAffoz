@@ -11,7 +11,7 @@ export default function Profile() {
   const dispatch = useDispatch();
   const handleSignOut = async () => {
     try {
-      await AsyncStorage.clear();
+      AsyncStorage.clear();
       dispatch(changeLogin());
       RNRestart.Restart();
     } catch (error) {

@@ -64,10 +64,11 @@ export default function Connect({navigation}) {
     scanWifi();
     currentSSID();
   }, []);
-  const handleDetailWifi = SSID => {
+  const handleDetailWifi = (SSID, capabilities) => {
     navigation.navigate('DetailConnect', {
       SSID: SSID,
       listWifi: listWifi,
+      capabilities: capabilities,
     });
   };
   return (
@@ -87,7 +88,7 @@ export default function Connect({navigation}) {
                 key={i}
                 handleDetailWifi={handleDetailWifi}
                 isConnect={SSIDCurrent === item.SSID ? true : false}
-                isPrivate={item.BSSID ? true : false}
+                isPrivate={item.capabilities.includes('WPA')}
               />
             );
           })
