@@ -64,6 +64,7 @@ export default function Router() {
   }
 
   useEffect(() => {
+    console.log('checkToken');
     const getData = async () => {
       setIsLoading(true);
       try {

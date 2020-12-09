@@ -10,8 +10,10 @@ import {Icon} from 'react-native-elements';
 import SimpleToast from 'react-native-simple-toast';
 import {WifiWizard} from 'react-native-wifi-and-hotspot-wizard';
 import NetInfo from '@react-native-community/netinfo';
+import Toast from 'react-native-toast-message';
 
 import {Button, OneWifi} from '../../components';
+import {connectWifiNetwork} from '../../helpers/connectWifi';
 
 export default function Connect({navigation}) {
   const [listWifi, setListWifi] = useState([]);
@@ -59,18 +61,33 @@ export default function Connect({navigation}) {
       });
   };
 
+  const handleDetailWifi = (SSID, capabilities) => {
+    const network = listWifi.filter(item => {
+      return item.SSID == SSID;
+    });
+    const password = '';
+    SimpleToast.show(`Connecting to ${SSID}...`);
+    connectWifiNetwork(network[0], SSID, password)
+      .then(res => {
+        setIsLoading(false);
+        SimpleToast.show(`Connected to ${SSID}`);
+        navigation.navigate('DetailConnect', {
+          SSID: SSID,
+          listWifi: listWifi,
+          capabilities: capabilities,
+        });
+      })
+      .catch(err => {
+        SimpleToast.show(`Connect to ${SSID} is error. Please Try again !!!`);
+      });
+  };
+
   useEffect(() => {
     permissionsAndroid();
     scanWifi();
     currentSSID();
   }, []);
-  const handleDetailWifi = (SSID, capabilities) => {
-    navigation.navigate('DetailConnect', {
-      SSID: SSID,
-      listWifi: listWifi,
-      capabilities: capabilities,
-    });
-  };
+
   return (
     <View style={Styles.full}>
       <View style={Styles.title}>
@@ -126,3 +143,29 @@ const Styles = StyleSheet.create({
     height: '100%',
   },
 });
+
+{
+  /* <View>
+            <ActivityIndicator size="large" color="#facd02" />
+            {isTakeSerilNumber ? (
+              <Text>Taking serialNumer...</Text>
+            ) : (
+              <Text>Connecting...</Text>
+            )}
+          </View> */
+}
+{
+  /* <Overlay
+Overlay
+isVisible={modalVisible}
+onBackdropPress={() => setModalVisible(false)}
+overlayStyle={Styles.overlay}>
+
+
+
+  <>
+  
+  </>
+
+</Overlay> */
+}
